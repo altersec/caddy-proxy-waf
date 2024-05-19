@@ -8,7 +8,7 @@
 		format console
 		level info
 	}
-    #email admin@localhost
+    email admin@{$SERVER_NAME}
 }
 
 {$SERVER_NAME} {

@@ -23,22 +23,30 @@ docker compose exec -w /etc/caddy caddy-waf caddy fmt --overwrite
 
 ## docker-compose example
 ```
-  caddy-waf:
-    image: ghcr.io/altersec/caddy-waf:latest
+  caddy-proxy-waf:
+    image: ghcr.io/altersec/caddy-proxy-waf:latest
     build:
-      context: ./caddy-waf/.
-    container_name: caddy-waf
+      context: ./caddy-proxy-waf/.
+    container_name: caddy-proxy-waf
     restart: always
-    command: ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile", "--watch"]
+    # command: ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile", "--watch"]
     ports:
       - "80:80"
       - "443:443"
       - "443:443/udp"
+    environment:
+      - SERVER_NAME=${SERVER_NAME:-localhost}
     volumes:
       - caddy_data:/data
-      - ./caddy-waf/Caddyfile:/etc/caddy/Caddyfile
-      - ./caddy-waf/extras:/etc/caddy/extras
-      - ./caddy-waf/coraza:/opt/coraza/config
+      - ./caddy-proxy-waf/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy-proxy-waf/extras:/etc/caddy/extras
+      - ./caddy-proxy-waf/coraza:/opt/coraza/config
+      - ./caddy-proxy-waf/logs:/var/log/caddy
     networks:
       - proxy
+
+volumes:
+  caddy_data:
+    driver: local
+
 ```
