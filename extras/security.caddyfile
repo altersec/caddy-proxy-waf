@@ -1,0 +1,46 @@
+#Security Headers and configurations to harden production servers
+#Feedback: altersec.com/contact
+
+header /* {
+    # Harden security headers
+    # https://owasp.org/www-project-secure-headers/#configuration-proposal
+    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
+
+    # Remove headers
+    -Server
+    -X-Powered-By
+
+    # Add fun headers
+    X-Powered-By altersec.com
+    X-Hacker altersec.com/security-policy
+    X-Recruiting altersec.com/hacker-for-hire
+
+    # Add security headers
+    Strict-Transport-Security   max-age=31536000
+    X-Frame-Options	deny
+    X-Content-Type-Options  nosniff
+    Content-Security-Policy	default-src 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content
+    X-Permitted-Cross-Domain-Policies	none
+    Referrer-Policy	no-referrer
+    Clear-Site-Data	"cache","cookies","storage"
+    Cross-Origin-Embedder-Policy	require-corp
+    Cross-Origin-Opener-Policy	same-origin
+    Cross-Origin-Resource-Policy	same-origin
+    # Permissions-Policy	accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),display-capture=(),document-domain=(),encrypted-media=(),fullscreen=(),gamepad=(),geolocation=(),gyroscope=(),layout-animations=(self),legacy-image-formats=(self),magnetometer=(),microphone=(),midi=(),oversized-images=(self),payment=(),picture-in-picture=(),publickey-credentials-get=(),speaker-selection=(),sync-xhr=(self),unoptimized-images=(self),unsized-media=(self),usb=(),screen-wake-lock=(),web-share=(),xr-spatial-tracking=()
+    Cache-Control	no-store, max-age=0
+    Access-Control-Allow-Origin	*
+    Access-Control-Allow-Methods	GET, POST, PUT, DELETE, OPTIONS
+    Access-Control-Allow-Headers	Content-Type, Authorization
+    Access-Control-Allow-Credentials	true
+    }
+
+respond /healthz 200
+
+redir /.well-known/security.txt https://altersec.com/.well-known/security.txt 301
+
+respond /robots.txt `User-agent: *
+Disallow: /
+# Looking for trouble? Join us: office@altersec.com`
+
+respond /humans.txt `Errare humanum est, perseverare autem diabolicum. altersec.com`
+

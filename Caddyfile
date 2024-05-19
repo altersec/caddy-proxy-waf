@@ -1,0 +1,34 @@
+{
+	# debug
+	# auto_https off
+	admin off
+    # admin unix//run/caddy-admin.sock
+	order coraza_waf first
+	log {
+		format console
+		level info
+	}
+    #email admin@localhost
+}
+
+{$SERVER_NAME} {
+	import extras/security.caddyfile
+
+	coraza_waf {
+		load_owasp_crs
+
+		directives `
+		Include /opt/coraza/config/*.conf
+		`
+	}
+	reverse_proxy http://api:8055
+
+    log {
+        output file /var/log/caddy/access.log {
+            roll_size 100mb
+            roll_keep 20
+            roll_keep_for 2160h
+          }
+      }
+
+}
