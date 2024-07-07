@@ -1,10 +1,10 @@
-ARG CADDY_VERSION=2.7.6
+ARG CADDY_VERSION=2.8.4
 
 FROM caddy:${CADDY_VERSION}-builder-alpine AS builder
 RUN  xcaddy build \
     --with github.com/corazawaf/coraza-caddy/v2
 
-ARG CRS_RELEASE=4.2.0
+ARG CRS_RELEASE=4.4.0
 
 RUN set -eux; \
     apk add --no-cache \
