@@ -10,6 +10,7 @@ services:
       - "443:443/udp"
     environment:
       SERVER_NAME: ${SERVER_NAME:-localhost}
+      BACKEND: ${BACKEND:-http://api:8055} # change to http://api:3000 for juice-shop
     volumes:
       - caddy_data:/data
       - ./custom/Caddyfile:/etc/caddy/Caddyfile
@@ -19,23 +20,23 @@ services:
     networks:
       - proxy
 
-  api:
-    image: bkimminich/juice-shop
-    ports:
-      - 3000:3000
-    networks:
-      - proxy
-
-  # or use go-httpbin - cange Caddyfile reverse_proxy to http://api:8055
   # api:
-  #   image: mccutchen/go-httpbin:v2.14.0
-  #   environment:
-  #     - MAX_BODY_SIZE=15728640 # 15 MiB
-  #   command: [ "/bin/go-httpbin", "-port", "8055" ]
+  #   image: bkimminich/juice-shop
   #   ports:
-  #     - 8055:8055
+  #     - 3000:3000
   #   networks:
   #     - proxy
+
+  # or use go-httpbin - cange Caddyfile reverse_proxy to http://api:8055
+  api:
+    image: mccutchen/go-httpbin:v2.14.0
+    environment:
+      - MAX_BODY_SIZE=15728640 # 15 MiB
+    command: [ "/bin/go-httpbin", "-port", "8055" ]
+    ports:
+      - 8055:8055
+    networks:
+      - proxy
 
 volumes:
     caddy_data:

@@ -15,13 +15,16 @@
 	import extras/security.caddyfile
 
 	coraza_waf {
-		load_owasp_crs
-
 		directives `
-		Include /opt/coraza/config/*.conf
+		Include /etc/caddy/coraza/*.conf
+		Include /opt/owasp-crs/rules/*.conf
+		SecRuleEngine On
+		# SecDebugLog /dev/stdout
+		# SecDebugLogLevel 9
 		`
 	}
-	reverse_proxy http://api:8055
+
+	reverse_proxy {$BACKEND}
 
     log {
         output file /var/log/caddy/access.log {

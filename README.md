@@ -35,16 +35,16 @@ docker compose exec -w /etc/caddy caddy-proxy-waf caddy fmt --overwrite
       - "443:443"
       - "443:443/udp"
     environment:
-      - SERVER_NAME=${SERVER_NAME:-localhost}
+      SERVER_NAME: ${SERVER_NAME:-localhost}
+      BACKEND: ${BACKEND:-http://api:8055}
     volumes:
       - caddy_data:/data
       - ./caddy-proxy-waf/Caddyfile:/etc/caddy/Caddyfile
       - ./caddy-proxy-waf/extras:/etc/caddy/extras
-      - ./caddy-proxy-waf/coraza:/opt/coraza/config
+      - ./caddy-proxy-waf/coraza:/etc/caddy/coraza
       - ./caddy-proxy-waf/logs:/var/log/caddy
     networks:
       - proxy
-
 volumes:
   caddy_data:
     driver: local
@@ -63,6 +63,10 @@ Run ./scripts/test.sh and check if all responses match
 docker compose down -f
 
 Try different backends.
+
+docker run --rm --network="host" -it \
+-v ${PWD}/reports:/app/reports \
+wallarm/gotestwaf --url=https://localhost
 
 ### Wordpress
 docker compose -f docker-compose.yml -f docker-compose.wptest.yml up
