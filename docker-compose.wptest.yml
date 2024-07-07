@@ -1,0 +1,53 @@
+services:
+  caddy-proxy-waf:
+    volumes:
+      - caddy_data:/data
+      - ./custom/extras:/etc/caddy/extras
+      - ./custom/coraza:/etc/caddy/coraza
+      - ./logs:/var/log/caddy
+      - ./custom/Caddyfile-wptest:/etc/caddy/Caddyfile #custom Caddyfile for wptest
+      - ./custom/wordpress:/var/www/html #wordpress files
+    networks:
+      - proxy
+
+  api:
+    image: wordpress:php8.2-fpm-alpine
+    restart: always
+    depends_on:
+      - db
+      - caddy-proxy-waf
+    ports:
+      - 9000:80
+    environment:
+      - WORDPRESS_DB_HOST=db
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=wordpress
+      - WORDPRESS_DB_NAME=wordpress
+      - WORDPRESS_DEBUG=1
+      - HTTP_X_FORWARDED_PROTO=https
+    volumes:
+      - ./custom/wordpress:/var/www/html
+    networks:
+      - proxy
+      - db
+
+  db:
+    image: mariadb:latest
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=somewordpress
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=wordpress
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - db
+
+volumes:
+    db_data:
+    caddy_data:
+
+networks:
+  proxy:
+  db:

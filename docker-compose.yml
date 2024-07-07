@@ -1,0 +1,44 @@
+services:
+  caddy-proxy-waf:
+    image: ghcr.io/altersec/caddy-proxy-waf:latest
+    container_name: caddy-proxy-waf
+    restart: always
+    command: ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile", "--watch"]
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      SERVER_NAME: ${SERVER_NAME:-localhost}
+    volumes:
+      - caddy_data:/data
+      - ./custom/Caddyfile:/etc/caddy/Caddyfile
+      - ./custom/extras:/etc/caddy/extras
+      - ./custom/coraza:/etc/caddy/coraza
+      - ./logs:/var/log/caddy
+    networks:
+      - proxy
+
+  api:
+    image: bkimminich/juice-shop
+    ports:
+      - 3000:3000
+    networks:
+      - proxy
+
+  # or use go-httpbin - cange Caddyfile reverse_proxy to http://api:8055
+  # api:
+  #   image: mccutchen/go-httpbin:v2.14.0
+  #   environment:
+  #     - MAX_BODY_SIZE=15728640 # 15 MiB
+  #   command: [ "/bin/go-httpbin", "-port", "8055" ]
+  #   ports:
+  #     - 8055:8055
+  #   networks:
+  #     - proxy
+
+volumes:
+    caddy_data:
+
+networks:
+  proxy:

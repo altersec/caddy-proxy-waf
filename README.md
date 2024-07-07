@@ -11,14 +11,14 @@ coraza\RULE-EXCEPTIONS.conf is where the rule exceptions should be made
 
 ## BUILD
 ```
-docker build -t altersec/caddy-waf .
-docker buildx build --push --tag altersec/caddy-waf:latest .
+docker buildx -t altersec/caddy-proxy-waf .
+docker buildx build --push --tag altersec/caddy-proxy-waf:latest .
 ```
 
 ## RELOAD
 ```
-docker compose exec -w /etc/caddy caddy-waf caddy reload
-docker compose exec -w /etc/caddy caddy-waf caddy fmt --overwrite
+docker compose exec -w /etc/caddy caddy-proxy-waf caddy reload
+docker compose exec -w /etc/caddy caddy-proxy-waf caddy fmt --overwrite
 ```
 
 ## docker-compose example
@@ -50,3 +50,25 @@ volumes:
     driver: local
 
 ```
+
+## Custom app
+
+mkdir -p custom
+cp -r Caddyfile coraza extras custom/.
+
+## Test
+
+docker compose up
+Run ./scripts/test.sh and check if all responses match
+docker compose down -f
+
+Try different backends.
+
+### Wordpress
+docker compose -f docker-compose.yml -f docker-compose.wptest.yml up
+./scripts/test.sh
+docker compose -f docker-compose.yml -f docker-compose.wptest.yml down -v
+
+# Logs
+
+sudo chmod go+r ./logs/*

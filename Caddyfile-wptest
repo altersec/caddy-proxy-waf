@@ -1,0 +1,75 @@
+{
+	# debug
+	# auto_https off
+	admin off
+    # admin unix//run/caddy-admin.sock
+	order coraza_waf first
+	log {
+		format console
+		level info
+	}
+    email admin@{$SERVER_NAME}
+}
+
+(trusted_proxy_list) {
+       ## Uncomment & adjust the following line to configure specific ranges which should be considered as trustworthy.
+       trusted_proxies 10.0.0.0/8 172.16.0.0/16 192.168.0.0/16 fc00::/7
+}
+
+{$SERVER_NAME} {
+	import extras/security.caddyfile
+
+	coraza_waf {
+		directives `
+		Include /etc/caddy/coraza/*.conf
+		Include /opt/owasp-crs/rules/*.conf
+		#Include @coraza.conf-recommended
+		#Include @crs-setup.conf.example
+		#Include @owasp_crs/*.conf
+		SecRuleEngine On
+		SecDebugLog /dev/stdout
+		SecDebugLogLevel 9
+		`
+	}
+
+	root * /var/www/html
+	file_server
+	php_fastcgi http://api:9000 {
+		root /var/www/html
+    # 	header_up X-Forwarded-Proto https
+	# 	header_up Host {upstream_hostport}
+    #   header_up X-Real-IP {remote_host}
+    #   header_up X-Forwarded-For {remote_ip}
+	# 	import trusted_proxy_list
+	}
+
+	#Alternative to php_fastcgi	
+	# @indexFiles file {
+	# 	try_files {path} {path}/index.php index.php
+	# 	split_path .php
+	# }
+	# rewrite @indexFiles {file_match.relative}
+
+	# @canonicalPath {
+	# 	file {path}/index.php
+	# 	not path */
+	# }
+	# redir @canonicalPath {http.request.orig_uri.path}/ 308
+	# @phpFiles path *.php
+
+	# reverse_proxy @phpFiles http://api:9000 {
+	# 	transport fastcgi {
+	# 		root /var/www/html
+	# 		split .php
+	# 	}
+	# }
+
+  log {
+		output file /var/log/caddy/access.log {
+				roll_size 100mb
+				roll_keep 20
+				roll_keep_for 2160h
+			}
+	}
+
+}
