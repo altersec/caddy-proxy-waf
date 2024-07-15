@@ -29,4 +29,4 @@ COPY --from=builder /opt/owasp-crs/rules /opt/owasp-crs/rules
 
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY extras /etc/caddy/extras
-COPY coraza /etc/caddy/config
+COPY coraza /etc/caddy/coraza
