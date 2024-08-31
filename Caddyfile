@@ -11,9 +11,52 @@
     email admin@{$SERVER_NAME}
 }
 
-{$SERVER_NAME} {
-	import extras/security.caddyfile
+(logging) {
+    log {
+        output file /var/log/caddy/access.log {
+            roll_size 100mb
+            roll_keep 20
+            roll_keep_for 2160h
+          }
+      }
+}
 
+(checks) {
+	# check if the client is local
+	# @is_local remote_ip 192.168.9.0/24
+
+	# check if the client is from an authorised country (with the plugin caddy-maxmind-geolocation)
+	@in_countries {
+		maxmind_geolocation {
+			db_path "/etc/caddy/extras/GeoLite2-Country.mmdb"
+			allow_countries NZ AU
+		}
+	}
+
+	# check if the url is admin... and so authorised from local only 
+	#@url_wp_adm {
+	#	path /wp-admin* /wp-login* /wp-comments*
+	#}
+}
+
+(rateLimit) {
+	# rate limit for all client (static_limit) and each client (dynamic_limit)
+	rate_limit {
+		distributed
+		zone static_limit {
+			key static
+			events 100
+			window 10s
+		}
+		zone dynamic_limit {
+			key {remote_host}
+			events 400
+			window 1m
+		}
+	}
+}
+
+(waf) {
 	coraza_waf {
 		directives `
 		Include /etc/caddy/coraza/*.conf
@@ -23,15 +66,35 @@
 		# SecDebugLogLevel 9
 		`
 	}
+}
 
-	reverse_proxy {$BACKEND}
+(cloudflare-only) {
+	@blocked not remote_ip 173.245.48.0/20 103.21.244.0/22 103.22.200.0/22 103.31.4.0/22 141.101.64.0/18 108.162.192.0/18 190.93.240.0/20 188.114.96.0/20 197.234.240.0/22 198.41.128.0/17 162.158.0.0/15 104.16.0.0/13 104.24.0.0/14 172.64.0.0/13 131.0.72.0/22 2400:cb00::/32 2606:4700::/32 2803:f800::/32 2405:b500::/32 2405:8100::/32 2a06:98c0::/29 2c0f:f248::/32 
+	respond @blocked "<h1>403</h1>" 403
+  }
 
-    log {
-        output file /var/log/caddy/access.log {
-            roll_size 100mb
-            roll_keep 20
-            roll_keep_for 2160h
-          }
-      }
+(trusted_proxy_list) {
+	trusted_proxies 10.0.0.0/8 172.16.0.0/16 192.168.0.0/16 fc00::/7 173.245.48.0/20 103.21.244.0/22 103.22.200.0/22 103.31.4.0/22 141.101.64.0/18 108.162.192.0/18 190.93.240.0/20 188.114.96.0/20 197.234.240.0/22 198.41.128.0/17 162.158.0.0/15 104.16.0.0/13 104.24.0.0/14 172.64.0.0/13 131.0.72.0/22 2400:cb00::/32 2606:4700::/32 2803:f800::/32 2405:b500::/32 2405:8100::/32 2a06:98c0::/29 2c0f:f248::/32
+	header_up X-Forwarded-For {http.request.header.CF-Connecting-IP}
+}
 
+
+{$SERVER_NAME} {
+    handle {
+		import trusted_proxy_list
+        import cloudflare-only
+		import extras/security.caddyfile
+		import logging
+		import waf
+
+		reverse_proxy {$BACKEND}
+	}
+}
+
+:80 {
+    respond "<h1>403</h1>" 403
+}
+
+:443 {
+    respond "<h1>403</h1>" 403
 }
