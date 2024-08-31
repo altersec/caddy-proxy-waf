@@ -2,8 +2,8 @@ ARG CADDY_VERSION=2.8.4
 
 FROM caddy:${CADDY_VERSION}-builder-alpine AS builder
 RUN  xcaddy build \
-    --with github.com/corazawaf/coraza-caddy/v2=github.com/altersec/coraza-caddy \
-    --with github.com/porech/caddy-maxmind-geolocation=github.com/altersec/caddy-maxmind-geolocation
+    --with github.com/corazawaf/coraza-caddy/v2 \
+    --with github.com/porech/caddy-maxmind-geolocation
 
 ARG CRS_RELEASE=4.6.0
 

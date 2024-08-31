@@ -11,8 +11,8 @@ coraza\RULE-EXCEPTIONS.conf is where the rule exceptions should be made
 
 ## BUILD
 ```
-docker buildx -t altersec/caddy-proxy-waf .
-docker buildx build --push --tag altersec/caddy-proxy-waf:latest .
+docker build -t altersec/caddy-proxy-waf .
+docker build --push --tag altersec/caddy-proxy-waf:latest .
 ```
 
 ## RELOAD
