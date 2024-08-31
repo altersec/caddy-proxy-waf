@@ -4,7 +4,7 @@ FROM caddy:${CADDY_VERSION}-builder-alpine AS builder
 RUN  xcaddy build \
     --with github.com/corazawaf/coraza-caddy/v2
 
-ARG CRS_RELEASE=4.4.0
+ARG CRS_RELEASE=4.6.0
 
 RUN set -eux; \
     apk add --no-cache \
