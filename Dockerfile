@@ -23,8 +23,8 @@ RUN set -eux; \
 FROM caddy:${CADDY_VERSION}-alpine AS final
 RUN  rm -rf /usr/share/caddy/ && \
     apk --update-cache upgrade && \
-    find /usr/sbin /usr/bin /sbin /bin -delete -executable -not -iname '*.so*' -a -not -type d && \
-    mkdir -p /var/log/caddy && touch /var/log/caddy/access.log
+    mkdir -p /var/log/caddy && touch /var/log/caddy/access.log && \
+    find /usr/sbin /usr/bin /sbin /bin -delete -executable -not -iname '*.so*' -a -not -type d
  
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 COPY --from=builder /opt/owasp-crs/rules /opt/owasp-crs/rules
