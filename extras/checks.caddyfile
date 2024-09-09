@@ -1,0 +1,15 @@
+# check if the client is local
+# @is_local remote_ip 192.168.9.0/24
+
+# check if the client is from an authorised country (with the plugin caddy-maxmind-geolocation)
+@in_countries {
+	maxmind_geolocation {
+		db_path "/etc/caddy/extras/GeoLite2-Country.mmdb"
+		allow_countries NZ AU
+	}
+}
+
+# check if the url is admin... and so authorised from local only 
+#@url_wp_adm {
+#	path /wp-admin* /wp-login* /wp-comments*
+#}

@@ -1,0 +1,14 @@
+# rate limit for all client (static_limit) and each client (dynamic_limit)
+rate_limit {
+	distributed
+	zone static_limit {
+		key static
+		events 100
+		window 10s
+	}
+	zone dynamic_limit {
+		key {remote_host}
+		events 400
+		window 1m
+	}
+}
