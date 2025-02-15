@@ -1,11 +1,11 @@
-ARG CADDY_VERSION=2.8.4
+ARG CADDY_VERSION=2.9.1
 
 FROM caddy:${CADDY_VERSION}-builder-alpine AS builder
 RUN  xcaddy build \
     --with github.com/corazawaf/coraza-caddy/v2 \
     --with github.com/porech/caddy-maxmind-geolocation
 
-ARG CRS_RELEASE=4.6.0
+ARG CRS_RELEASE=4.11.0
 
 RUN set -eux; \
     apk add --no-cache \
