@@ -53,26 +53,36 @@ volumes:
 
 ## Custom app
 
+```
 mkdir -p custom
 cp -r Caddyfile coraza extras custom/.
+```
 
 ## Test
 
+```
 docker compose up
 Run ./scripts/test.sh and check if all responses match
 docker compose down -f
+```
 
 Try different backends.
 
+```
 docker run --rm --network="host" -it \
 -v ${PWD}/reports:/app/reports \
 wallarm/gotestwaf --url=https://localhost
+```
 
 ### Wordpress
+
+```
 docker compose -f docker-compose.yml -f docker-compose.wptest.yml up
 ./scripts/test.sh
 docker compose -f docker-compose.yml -f docker-compose.wptest.yml down -v
-
+```
 # Logs
 
+```
 sudo chmod go+r ./logs/*
+```
