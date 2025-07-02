@@ -3,7 +3,7 @@ ARG CADDY_VERSION=2.10.0
 FROM caddy:${CADDY_VERSION}-builder-alpine AS builder
 RUN  xcaddy build \
     --with github.com/corazawaf/coraza-caddy/v2 \
-    --with github.com/porech/caddy-maxmind-geolocation
+    --with github.com/porech/caddy-maxmind-geolocation \
     --with github.com/caddy-dns/cloudflare
 
 ARG CRS_RELEASE=4.16.0
