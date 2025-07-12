@@ -11,7 +11,6 @@ ARG CRS_RELEASE=4.16.0
 RUN set -eux; \
     apk add --no-cache \
         ca-certificates \
-        libnss3-tools \
         curl \
         gnupg; \
     mkdir /opt/owasp-crs; \

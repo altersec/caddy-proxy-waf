@@ -2,6 +2,7 @@
 	# debug
 	# auto_https off
 	admin off
+	skip_install_trust
     # admin unix//run/caddy-admin.sock
 	order coraza_waf first
 	log {
